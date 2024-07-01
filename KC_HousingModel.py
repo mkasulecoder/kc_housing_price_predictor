@@ -1,6 +1,8 @@
 """
-Let’s build a linear regression model for a real world example.
-We are going to predict the house price based on its space features.
+Let’s build a linear regression model that predicts the house price based on its space features.
+@author Mark Kasule
+Introduction to Data Science [DATA 300]
+Date 07/01/2024
 """
 
 # import all libraries
@@ -9,6 +11,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
+# LR1 DATASET
 # read file from file
 file = "kc_house_data.csv"
 df = pd.read_csv(file)
@@ -25,16 +28,19 @@ df = pd.read_csv(file)
 y = df["price"]
 X = df[["bedrooms", "sqft_living", "yr_built"]]
 
-# RAW DATA
-sns.scatterplot(x=df["bedrooms"], y=y)
+# RAW DATA - FEATURES
 sns.scatterplot(x=df["sqft_living"], y=y)
-sns.scatterplot(x=df["yr_built"], y=y)
 plt.ticklabel_format(axis="y", style="plain")
+plt.ylabel("Price")
+plt.xlabel("SQFT Living")
+plt.title("SQFT LIVING vs Price for KC Housing")
+plt.legend(['Actual Price'])
 plt.show()
 
 """
-Note the mean house price is about $540,000, 
-with a standard deviation of $367,000 so there is a broad range of house prices 
+Computer
+- Mean house price
+- Standard deviation of house prices 
 (68% are within 1 standard deviation,
  95% within 2 s.d. 
  and 99.7% within 3 s.d.):
@@ -46,7 +52,7 @@ print("STD:", np.std(y))
 Building Model
 Now, we can build the linear regression model. 
 Formular: y=β0 +β1X1 +β2X2 +...+βpXp  == x values are input values whereas beta values are their coefficients.
-We just want to know beta 1 to p coefficients and beta 0 intercept.
+We need to know beta 1 to p coefficients and beta 0 intercept.
 NOTE: This approach uses from sklearn.model_selection import train_test_split with
 a corresponding train_size parameter (e.g. train_size=0.8 [same as 80% of population]) to denote the sample size
 that should be randomly selected from the data to perform training of the model.
@@ -63,12 +69,47 @@ from sklearn.linear_model import LinearRegression
 lr = LinearRegression()
 lr.fit(X_train, y_train)
 
-# Predicting the Salary for the test values
+# Predicting the Prices for the test values
 y_predictions = lr.predict(X_test)
+# print(len(y))
+# print(len(y_predictions))
+# print(len(df["sqft_living"]))
+
+"""
+Plot the Actual prices vs the predicted prices for the test set
+lot the predicted prices against the sqft_living values from the test set (X_test["sqft_living"])
+to avoid differences in lengths between the actual prices and the predicted prices
+"""
+plt.scatter(X_test["sqft_living"], y_test, color='blue', label='Actual Price')
+plt.scatter(X_test["sqft_living"], y_predictions, color='red', label='Predicted Price')
+plt.ticklabel_format(axis="y", style="plain")
+plt.ylabel("Price")
+plt.xlabel("SQFT Living")
+plt.title("SQFT LIVING vs Price for KC Housing")
+plt.legend()
+plt.show()
 
 # Intercept and coeff of the line
 print("Intercept of the model:", lr.intercept_)
 print("Coeff of the model:", lr.coef_)
+
+"""
+Plot the error
+Errors/Residuals are calculated as the difference between the actual and predicted values:
+residual=y_test−y_predictions
+"""
+# Calculate and plot the residuals
+residuals = y_test - y_predictions
+
+plt.figure(figsize=(10, 6))
+plt.scatter(X_test["sqft_living"], residuals, color='blue')
+plt.axhline(y=0, color='red', linestyle='--')
+plt.ticklabel_format(axis="y", style="plain")
+plt.ylabel("Residuals")
+plt.xlabel("SQFT Living")
+plt.legend(["Errors"], loc="best")
+plt.title("Errors of Predicted Prices for KC Housing")
+plt.show()
 
 """
 Our regression formula:
@@ -77,7 +118,7 @@ Simplifying a bit (dropping everything to the right of the decimal):
 y = 4601037 - 39547*X1 + 322*X2 - 2334*X3
 
 Accuracy
-The built lr regression model provides a predict function. 
+The lr regression model provides a predict function. 
 We will call this function and pass features during training. 
 We also have the actual values in the y dataframe. 
 So we can calculate a Mean Absolute Error (mae) of our prediction.
@@ -99,9 +140,5 @@ print("Coefficient of determination (R^2):", R_squared)  # output is ~ 0.529
 
 """
 CONCLUSION
-This means that 54% of the variation in house prices can be explained by the variation in our three features:
- bedrooms, square foot living space, and year built. 
- We can use this figure to compare with other combinations of features.
+This means that about 53% of the variation in house prices can be explained by the variation in the square foot living space feature.
 """
-
-#
